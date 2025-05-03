@@ -78,26 +78,32 @@ if os.path.exists(csv_path):
     
     # Clustering with KMeans
     st.subheader("KMeans Clustering")
-    X = df_cleaned[['Income', 'MntWines']].dropna()
+
+    # Let user select features for x and y axes
+    feature_options = list(df_cleaned.columns)
+    x_feature = st.selectbox("Select feature for X-axis", feature_options, index=feature_options.index('Income') if 'Income' in feature_options else 0)
+    y_feature = st.selectbox("Select feature for Y-axis", feature_options, index=feature_options.index('MntWines') if 'MntWines' in feature_options else 1)
+
+    X = df_cleaned[[x_feature, y_feature]].dropna()
     kmeans = KMeans(n_clusters=4, random_state=0)
     y_kmeans = kmeans.fit_predict(X)
-    
+
     df_cleaned['Cluster'] = y_kmeans
-    
+
     fig, ax = plt.subplots(figsize=(10, 6))
-    scatter = ax.scatter(df_cleaned['Income'], df_cleaned['MntWines'], c=df_cleaned['Cluster'], cmap='viridis', alpha=0.6)
+    scatter = ax.scatter(df_cleaned[x_feature], df_cleaned[y_feature], c=df_cleaned['Cluster'], cmap='viridis', alpha=0.6)
     ax.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=500, c='red', marker='X', label='Centroids')
-    ax.set_title("Customer Segmentation based on Income and Spending on MntWines")
-    ax.set_xlabel("Income")
-    ax.set_ylabel("MntWines")
+    ax.set_title(f"Customer Segmentation based on {x_feature} and {y_feature}")
+    ax.set_xlabel(x_feature)
+    ax.set_ylabel(y_feature)
     ax.legend()
     st.pyplot(fig)
-    
+
     # Evaluation metrics
     silhouette = silhouette_score(X, y_kmeans)
     calinski_harabasz = calinski_harabasz_score(X, y_kmeans)
     davies_bouldin = davies_bouldin_score(X, y_kmeans)
-    
+
     st.write(f"Silhouette Score: {silhouette:.3f}")
     st.write(f"Calinski-Harabasz Index: {calinski_harabasz:.3f}")
     st.write(f"Davies-Bouldin Index: {davies_bouldin:.3f}")

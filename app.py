@@ -12,13 +12,13 @@ from scipy.stats import zscore
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
 # Step 1: Load Dataset
-st.title("Customer Personality Analysis")
+st.title("Project2_Group02")
 
 csv_path = "marketing_campaign.csv"
 if os.path.exists(csv_path):
     # Load the data
     df = pd.read_csv(csv_path, sep='\t')
-    st.write("Dataset Loaded")
+    st.write("Customer Personality Analysis")
     
     # Show the dataset preview
     st.subheader("Dataset Preview")

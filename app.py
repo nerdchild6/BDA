@@ -27,7 +27,7 @@ if os.path.exists(csv_path):
     # Data Preprocessing
     st.subheader("Data Preprocessing")
     st.write("Cleaning and dropping unnecessary columns...")
-    df_cleaned = df.drop(columns=['ID', 'Z_CostContact', 'Z_Revenue', 'Dt_Customer'])
+    df_cleaned = df.drop(columns=['ID', 'Z_CostContact', 'Z_Revenue', 'Dt_Customer', 'Education', 'Marital_Status'])
     
     # Handling missing values and duplicates
     df_cleaned.drop_duplicates(inplace=True)

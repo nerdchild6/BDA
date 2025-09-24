@@ -14,7 +14,8 @@ from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bo
 # Step 1: Load Dataset
 st.title("Project2_Group02")
 
-csv_path = "marketing_campaign.csv"
+# We assume the user has uploaded the file to the same directory or it's provided.
+csv_path = "marketing_campaign.csv" 
 if os.path.exists(csv_path):
     # Load the data
     df = pd.read_csv(csv_path, sep='\t')
@@ -46,7 +47,7 @@ if os.path.exists(csv_path):
         z_scores = pd.Series(z_scores, index=df_cleaned[col].dropna().index)
         mask &= z_scores.abs() <= 3
     
-    df_cleaned = df_cleaned.loc[mask]  # Apply mask to df_cleaned instead of df
+    df_cleaned = df_cleaned.loc[mask]
     
     # Show cleaned dataset preview
     st.write("Cleaned Data:")
@@ -85,14 +86,28 @@ if os.path.exists(csv_path):
     y_feature = st.selectbox("Select feature for Y-axis", feature_options, index=feature_options.index('MntWines') if 'MntWines' in feature_options else 1)
 
     X = df_cleaned[[x_feature, y_feature]].dropna()
-    kmeans = KMeans(n_clusters=4, random_state=0)
+    kmeans = KMeans(n_clusters=4, random_state=0, n_init=10)
     y_kmeans = kmeans.fit_predict(X)
 
     df_cleaned['Cluster'] = y_kmeans
 
+    # --- START OF MODIFICATION ---
+    # Define a fixed color map for each cluster label.
+    # This ensures consistency and prevents misleading interpretations as features change.
+    color_map = {
+        0: 'red',
+        1: 'blue',
+        2: 'green',
+        3: 'purple'
+    }
+
+    # Map the cluster labels in the DataFrame to the fixed colors
+    colors = df_cleaned['Cluster'].map(color_map)
+    # --- END OF MODIFICATION ---
+
     fig, ax = plt.subplots(figsize=(10, 6))
-    scatter = ax.scatter(df_cleaned[x_feature], df_cleaned[y_feature], c=df_cleaned['Cluster'], cmap='viridis', alpha=0.6)
-    ax.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=500, c='red', marker='X', label='Centroids')
+    scatter = ax.scatter(df_cleaned[x_feature], df_cleaned[y_feature], c=colors, alpha=0.6)
+    ax.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=500, c='black', marker='X', label='Centroids')
     ax.set_title(f"Customer Segmentation based on {x_feature} and {y_feature}")
     ax.set_xlabel(x_feature)
     ax.set_ylabel(y_feature)
@@ -107,6 +122,3 @@ if os.path.exists(csv_path):
     st.write(f"Silhouette Score: {silhouette:.3f}")
     st.write(f"Calinski-Harabasz Index: {calinski_harabasz:.3f}")
     st.write(f"Davies-Bouldin Index: {davies_bouldin:.3f}")
-
-
-
